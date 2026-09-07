@@ -436,9 +436,9 @@ Project setup resources require the setup-read scope.
 GitHub connections require the configuring user's access to the installation
 and repository. Discord connections require permission to manage the selected
 guild and a channel and optional role belonging to that guild. Public server
-profiles read player counts and observed mods only from the project that
-supplied the claim-bearing heartbeat; a matching server ID in another project
-does not grant access to that project's telemetry.
+profiles read player counts and observed mods only from snapshots accepted with
+that profile's claim token and authenticated project. A matching server ID alone,
+even within the same project, does not grant access to another producer's telemetry.
 
 For Hytale sign-in, we store the stable per-application Hytale subject
 identifier returned to Beacon and, when you grant the profile scope,
