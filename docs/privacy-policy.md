@@ -1,6 +1,6 @@
 # Beacon Privacy Policy
 
-Effective date: September 5, 2026
+Effective date: September 7, 2026
 
 This policy explains how Beacon, the Beacon hosted telemetry platform, and
 ModStats.io collect and use information. It covers:
@@ -427,6 +427,19 @@ once and store only protected verification values thereafter. Project policies
 can require portal approval before an agent changes an issue, creates a linked
 GitHub issue, or provisions an ingest credential.
 
+Suspended accounts cannot use their personal or OAuth MCP credentials. Revoking
+an OAuth credential also revokes its related refresh access. MCP manual-report
+tools and linked reports in issue workspaces return a limited metadata view;
+they omit contact values, raw report payloads, and private form/context fields.
+Project setup resources require the setup-read scope.
+
+GitHub connections require the configuring user's access to the installation
+and repository. Discord connections require permission to manage the selected
+guild and a channel and optional role belonging to that guild. Public server
+profiles read player counts and observed mods only from the project that
+supplied the claim-bearing heartbeat; a matching server ID in another project
+does not grant access to that project's telemetry.
+
 For Hytale sign-in, we store the stable per-application Hytale subject
 identifier returned to Beacon and, when you grant the profile scope,
 the selected Hytale profile username and UUID. Hytale does not provide us your
@@ -675,6 +688,11 @@ segmented public/private stats storage. No service can guarantee perfect
 security, and telemetry payloads can still contain sensitive data if a mod author
 or player puts that data into an allowed text field, exception, breadcrumb, log,
 or attachment.
+
+Public chart requests and response caches have size limits. Social-card avatar
+images are fetched only from public HTTPS destinations, with response-size
+limits and no redirect following. Attachment storage usage is measured from
+the retained content rather than relying on client-declared sizes.
 
 ## Third-Party Mods And Custom Fields
 
