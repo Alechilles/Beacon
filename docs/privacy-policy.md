@@ -434,7 +434,9 @@ they omit contact values, raw report payloads, and private form/context fields.
 Project setup resources require the setup-read scope.
 
 GitHub connections first authorize the current portal session with GitHub and
-require the configuring user's access to the installation and repository. Discord connections require permission to manage the selected
+require the configuring user's access to the installation and repository.
+Reconnecting checks the saved repository for an existing installation and restores
+the connection while preserving its repository and integration settings. Discord connections require permission to manage the selected
 guild and a channel and optional role belonging to that guild. Public server
 profiles read player counts and observed mods only from snapshots accepted with
 that profile's claim token and authenticated project. A matching server ID alone,
