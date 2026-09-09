@@ -311,6 +311,12 @@ private heartbeat payloads internally to compute aggregates, prevent duplicates,
 verify server claims, and maintain the public stats data. Public stats responses
 must expose only aggregate counts and breakdowns.
 
+The hosted service can store an unchanged loaded-mod list once and link recent
+server observations to that internal copy. Reuse is scoped to the authenticated
+source project; each attributed project's observations keep their own access and
+retention rules. Internal inventory identifiers do not grant access to another
+project's telemetry or replace server-claim verification.
+
 For passive projects and embedded contributions, a heartbeat is eligible only
 for the current per-project winner after project/Stats consent, descriptor
 `heartbeat` allowlisting, and destination resolution. Invalid,
@@ -597,8 +603,16 @@ Retention depends on the data type and operational need.
   public server listing history are retained while the project or server profile
   exists. Per-server stats bucket snapshots are retained for a
   recent active/evidence window of 30 days by default, and per-server loaded-mod
-  bucket snapshots are retained for 24 hours by default; both are deleted after
-  matching aggregate rollups exist.
+  bucket observations are eligible for use for 24 hours by default. Core server
+  snapshots are deleted after matching aggregate rollups exist. Expired per-server
+  mod observations are excluded from reads and become eligible for bounded
+  deletion independently of the longer core window, even if a mod-summary refresh
+  was not completed. Already-published aggregate history remains available.
+  Shared mod-list content remains only while another retained observation needs
+  it; unreferenced copies become eligible for bounded cleanup. This does not keep
+  expired server-to-mod-list history. Physical project erasure removes its
+  observations and source identifiers without deleting another project's valid
+  observations of the same list.
   Delayed queued heartbeats still contribute server/player statistics, but do
   not recreate per-server loaded-mod snapshots or recompute loaded-mod
   breakdowns for buckets outside the configured loaded-mod snapshot window.
