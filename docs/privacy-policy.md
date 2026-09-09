@@ -597,6 +597,9 @@ Retention depends on the data type and operational need.
   recent active/evidence window of 30 days by default, and per-server loaded-mod
   bucket snapshots are retained for 24 hours by default; both are deleted after
   matching aggregate rollups exist.
+  Delayed queued heartbeats still contribute server/player statistics, but do
+  not recreate per-server loaded-mod snapshots or recompute loaded-mod
+  breakdowns for buckets outside the configured loaded-mod snapshot window.
   Loaded-mod breakdowns retain 30-minute detail for 7 days by default, daily
   aggregates for 90 days by default, and weekly aggregates for 730 days by
   default. Weekly loaded-mod aggregates keep the 100 most common loaded mods
