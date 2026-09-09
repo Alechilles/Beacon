@@ -605,8 +605,8 @@ Retention depends on the data type and operational need.
   Loaded-mod summaries are refreshed asynchronously from recent snapshots.
   Pending refresh records contain a project identifier, time bucket, and
   processing status, not a copy of the heartbeat payload. Completed refresh
-  records are removed on publication; failed or expired records are retained
-  for up to 7 days for operational recovery.
+  records are removed on publication; failed or expired records become eligible
+  for deletion after 7 days of operational recovery retention.
   Loaded-mod breakdowns retain 30-minute detail for 7 days by default, daily
   aggregates for 90 days by default, and weekly aggregates for 730 days by
   default. Weekly loaded-mod aggregates keep the 100 most common loaded mods
