@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.2 - UI Texture Hotfix - 2026-09-11
+
+### Fixed
+- Reduced the consent and report header texture's pixel area by 97.6% to save
+  UI atlas space while preserving its decorative corners and borders.
+
 ## 2.0.1 - Consent Menu Hotfix - 2026-09-05
 
 ### Fixed
