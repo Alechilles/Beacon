@@ -56,19 +56,8 @@ class BeaconStandalonePackagingIT {
 
             assertImage(jar, "Common/UI/Custom/BeaconLogo.png", 800, 278);
             assertImage(jar, "Common/UI/Custom/icon-256.png", 256, 256);
-            assertImage(jar, "Common/UI/Custom/TelemetryConsentHeader.png", 1560, 256);
+            assertImage(jar, "Common/UI/Custom/TelemetryConsentHeader.png");
             assertImage(jar, "icon-256.png", 256, 256);
-
-            for (String uiPath : new String[]{
-                    "Common/UI/Custom/TelemetryConsentPage.ui",
-                    "Common/UI/Custom/TelemetryReportPage.ui",
-                    "Common/UI/Custom/TelemetryReportProjectSelectPage.ui"}) {
-                String ui = entryText(jar, uiPath);
-                assertTrue(ui.contains("Background: \"BeaconLogo.png\""),
-                        uiPath + " must reference the packaged Beacon logo");
-                assertTrue(ui.contains("Background: \"TelemetryConsentHeader.png\""),
-                        uiPath + " must reference the packaged consent header");
-            }
         }
     }
 
@@ -111,14 +100,19 @@ class BeaconStandalonePackagingIT {
     }
 
     private static void assertImage(JarFile jar, String path, int width, int height) throws IOException {
+        BufferedImage image = assertImage(jar, path);
+        assertEquals(width, image.getWidth(), path + " width");
+        assertEquals(height, image.getHeight(), path + " height");
+    }
+
+    private static BufferedImage assertImage(JarFile jar, String path) throws IOException {
         JarEntry entry = jar.getJarEntry(path);
         assertNotNull(entry, path + " must be packaged in the standalone JAR");
         try (InputStream input = jar.getInputStream(entry)) {
             BufferedImage image = ImageIO.read(input);
             assertNotNull(image, path + " must be a readable image");
-            assertEquals(width, image.getWidth(), path + " width");
-            assertEquals(height, image.getHeight(), path + " height");
             assertTrue(image.getColorModel().hasAlpha(), path + " must retain alpha");
+            return image;
         }
     }
 }

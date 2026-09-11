@@ -48,7 +48,8 @@ $C.@PageOverlay {
 
     #Title {
       Anchor: (Height: 128, Top: 0);
-      Background: "TelemetryConsentHeader.png";
+      // Fixed corners; stretch only the compact texture centre and straight edges.
+      Background: (TexturePath: "TelemetryConsentHeader.png", Border: 48);
       Padding: (Top: 10, Bottom: 10);
 
       Group #TelemetryConsentLogo {

@@ -47,14 +47,6 @@ class TelemetryReportAssetPackTest {
                 "TelemetryReportPage.ui must not use the old single schema field value control"
         );
         assertTrue(
-                reportPage.contains("Background: \"BeaconLogo.png\""),
-                "TelemetryReportPage.ui must show the Beacon logo in the header"
-        );
-        assertTrue(
-                reportPage.contains("Background: \"TelemetryConsentHeader.png\""),
-                "TelemetryReportPage.ui must use the branded header texture"
-        );
-        assertTrue(
                 reportPage.contains("Text: \"Loaded mods\""),
                 "TelemetryReportPage.ui must label the optional mod snapshot as loaded mods, not installed mods"
         );

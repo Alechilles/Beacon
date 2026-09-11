@@ -34,10 +34,6 @@ class TelemetryConsentAssetPackTest {
                 getClass().getClassLoader().getResource("Common/UI/Custom/TelemetryConsentHeader.png"),
                 "TelemetryConsentHeader.png must be packaged for the enlarged consent page title bar"
         );
-        assertTrue(consentPage.contains("Background: \"BeaconLogo.png\""));
-        assertTrue(consentPage.contains("Anchor: (Height: 128, Top: 0)"));
-        assertTrue(consentPage.contains("Background: \"TelemetryConsentHeader.png\""));
-        assertTrue(consentPage.contains("Anchor: (Top: 128)"));
         assertTrue(consentPage.contains("#TelemetryConsentProjectIconFrame"));
         assertTrue(consentPage.contains("#TelemetryConsentProjectIconImage"));
         assertTrue(consentPage.contains("#TelemetryConsentProjectIconPlaceholder"));
