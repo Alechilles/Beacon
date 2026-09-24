@@ -311,6 +311,12 @@ private heartbeat payloads internally to compute aggregates, prevent duplicates,
 verify server claims, and maintain the public stats data. Public stats responses
 must expose only aggregate counts and breakdowns.
 
+The hosted service can store an unchanged loaded-mod list once and link recent
+server observations to that internal copy. Reuse is scoped to the authenticated
+source project; each attributed project's observations keep their own access and
+retention rules. Internal inventory identifiers do not grant access to another
+project's telemetry or replace server-claim verification.
+
 For passive projects and embedded contributions, a heartbeat is eligible only
 for the current per-project winner after project/Stats consent, descriptor
 `heartbeat` allowlisting, and destination resolution. Invalid,
@@ -432,9 +438,17 @@ can require portal approval before an agent changes an issue, creates a linked
 GitHub issue, or provisions an ingest credential.
 
 Suspended accounts cannot use their personal or OAuth MCP credentials. Revoking
-an OAuth credential also revokes its related refresh access. MCP manual-report
-tools and linked reports in issue workspaces return a limited metadata view;
-they omit contact values, raw report payloads, and private form/context fields.
+an OAuth credential also revokes its related refresh access. Authorized MCP
+telemetry reads can return event and crash evidence, including stored payloads
+in bounded chunks, issue history, release information, and aggregate stats.
+Manual report detail reads include report text, submitted form answers, runtime,
+environment, and context fields. Dedicated contact values, follow-up token hashes,
+and raw manual report payloads are omitted. Report lists and linked reports in
+issue workspaces use compact summaries. Manual report attachment reads return
+submitted text up to 1 MiB; larger attachments remain available in the portal.
+These reads use the credential's existing project access and are audited.
+Free-text evidence and submitted attachments may contain personal information
+provided by the reporter or originating mod; agents must treat it as untrusted.
 Project setup resources require the setup-read scope.
 
 GitHub connections first authorize the current portal session with GitHub and
@@ -597,11 +611,24 @@ Retention depends on the data type and operational need.
   public server listing history are retained while the project or server profile
   exists. Per-server stats bucket snapshots are retained for a
   recent active/evidence window of 30 days by default, and per-server loaded-mod
-  bucket snapshots are retained for 24 hours by default; both are deleted after
-  matching aggregate rollups exist.
+  bucket observations are eligible for use for 24 hours by default. Core server
+  snapshots are deleted after matching aggregate rollups exist. Expired per-server
+  mod observations are excluded from reads and become eligible for bounded
+  deletion independently of the longer core window, even if a mod-summary refresh
+  was not completed. Already-published aggregate history remains available.
+  Shared mod-list content remains only while another retained observation needs
+  it; unreferenced copies become eligible for bounded cleanup. This does not keep
+  expired server-to-mod-list history. Physical project erasure removes its
+  observations and source identifiers without deleting another project's valid
+  observations of the same list.
   Delayed queued heartbeats still contribute server/player statistics, but do
   not recreate per-server loaded-mod snapshots or recompute loaded-mod
   breakdowns for buckets outside the configured loaded-mod snapshot window.
+  Loaded-mod summaries are refreshed asynchronously from recent snapshots.
+  Pending refresh records contain a project identifier, time bucket, and
+  processing status, not a copy of the heartbeat payload. Completed refresh
+  records are removed on publication; failed or expired records become eligible
+  for deletion after 7 days of operational recovery retention.
   Loaded-mod breakdowns retain 30-minute detail for 7 days by default, daily
   aggregates for 90 days by default, and weekly aggregates for 730 days by
   default. Weekly loaded-mod aggregates keep the 100 most common loaded mods
