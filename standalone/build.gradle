@@ -41,7 +41,7 @@ configurations.named('testImplementation') {
 hytaleTools {
     hytaleVersion = localProperty('hytale_version')
     patchline = localProperty('hytale_patchline')
-    manifestServerVersion = '>=0.5.0 <0.7.0'
+    manifestServerVersion = '>=0.5.0 <0.8.0 || >=0.7.0-pre.4 <0.7.0'
     manifestGroup = 'Alechilles'
     modId = 'Beacon'
     modDescription = 'Beacon — The developer platform behind ModStats.io.'

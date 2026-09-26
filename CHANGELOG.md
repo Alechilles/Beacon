@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Added Hytale Update 7 compatibility, including the `0.7.0-pre.4` pre-release, while retaining Update 5 and Update 6 support.
+
 ## 2.0.2 - UI Texture Hotfix - 2026-09-11
 
 ### Fixed
