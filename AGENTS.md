@@ -19,7 +19,8 @@ This is the default operating contract for human and AI contributors working in 
 
 ## Build and Local Runtime
 
-- Build from the shared workspace with `bash ../gradlew :alecstelemetry:standalone:build`; the runtime module remains an embeddable library and the standalone module produces the shaded Beacon plugin JAR.
+- From the canonical AlecsTelemetry checkout, build through its parent Modding workspace with `bash ../gradlew -p .. :alecstelemetry:standalone:build`. The runtime module remains an embeddable library and the standalone module produces the shaded Beacon plugin JAR.
+- In a worktree, verify the wrapper, settings, and project mapping before using a shared-workspace command. The workspace must include the current checkout. If it does not, use a correctly configured integration workspace or report that validation is unavailable; a build of the canonical checkout does not validate worktree edits.
 - Keep the internal shared-workspace Gradle path `:alecstelemetry:runtime`; this path is not the public Beacon namespace or artifact coordinate.
 - Do not place the standalone Beacon plugin in the default `runAllMods` workspace alongside Tamework, which already embeds the runtime. Use `C:\Users\22ale\AppData\Roaming\Hytale\Modding\run\mods` for local workspace staging and treat `UserData\Mods` as legacy comparison-only state.
 

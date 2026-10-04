@@ -1,6 +1,9 @@
 # Changelog
 
-## Unreleased
+## 2.0.3 - Player Ready Performance Hotfix - 2026-10-04
+
+- Removed mod archive discovery from player-ready handling to reduce join and world-transfer stalls. Discovery runs during startup, including for standby Beacon providers.
+- Reduced consent review checks to one file read per check instead of rereading it for each reviewed project.
 
 - Added Hytale Update 7 compatibility, including the `0.7.0-pre.4` pre-release, while retaining Update 5 and Update 6 support.
 
