@@ -11,6 +11,7 @@ import com.alechilles.beacon.coordinator.TelemetryCoordinatorService;
 import com.alechilles.beacon.coordinator.TelemetryRuntimeCandidate;
 import com.alechilles.beacon.coordinator.TelemetryRuntimeOrigin;
 import com.alechilles.beacon.consent.TelemetryConsentSnapshot;
+import com.alechilles.beacon.consent.TelemetryConsentStateStore;
 import com.alechilles.beacon.crash.CrashReportClient;
 import com.alechilles.beacon.crash.CrashReportEnvelope;
 import com.alechilles.beacon.project.TelemetryProjectDescriptor;
@@ -30,16 +31,20 @@ import com.alechilles.beacon.runtime.stats.TelemetryPlayerCounter;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
+import com.hypixel.hytale.server.core.event.events.player.PlayerReadyEvent;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.lang.reflect.Method;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -1034,6 +1039,65 @@ class TelemetryRuntimeHostTest {
         assertTrue(fixture.handle().unreviewedConsentProjects().stream()
                 .map(TelemetryProjectRegistration::projectId)
                 .anyMatch("late-passive-library"::equals));
+    }
+
+    @Test
+    void bootDiscoversPassiveProjectsForFailoverWithoutRescanningOnPlayerReady() throws Exception {
+        Path modsDir = tempDir.resolve("mods");
+        TelemetryProjectRegistration provider = project("Example:Telemetry", "provider", "Provider");
+        ProviderFixture standby = consentFixture(
+                "boot-discovery", List.of(provider), List.of(provider), List.of(),
+                tempDir.resolve("standby"), modsDir
+        );
+        ProviderFixture winner = fixture("embedded:Winner", TelemetryRuntimeOrigin.EMBEDDED, "9.0.0");
+        standby.handle().start();
+        winner.handle().start();
+        assertFalse(standby.handle().ownsActiveCoordinator());
+
+        // A passive descriptor becomes visible after this provider's bootstrap, before boot completes.
+        writePassiveArchive(modsDir, "boot-library");
+        standby.handle().onBoot();
+        winner.handle().shutdown();
+
+        assertTrue(standby.handle().ownsActiveCoordinator());
+        assertTrue(standby.handle().unreviewedConsentProjects().stream()
+                .anyMatch(project -> project.projectId().equals("boot-library")));
+        List<TelemetryProjectRegistration> bootProjects = standby.handle().projects();
+        TelemetryConsentStateStore consent = new TelemetryConsentStateStore(null);
+        for (TelemetryProjectRegistration project : bootProjects) {
+            assertTrue(consent.markReviewed(standby.dataPaths().consentStateFile(), project));
+        }
+        assertTrue(standby.handle().unreviewedConsentProjects().isEmpty());
+
+        // Joins and repeated readiness must use the boot snapshot, even if an archive changes.
+        writePassiveArchive(modsDir, "after-boot-library");
+        standby.handle().onPlayerReady(new PlayerReadyEvent(null, null, 1));
+        standby.handle().onPlayerReady(new PlayerReadyEvent(null, null, 2));
+        assertEquals(bootProjects, standby.handle().projects());
+        assertTrue(standby.handle().unreviewedConsentProjects().isEmpty());
+        standby.handle().shutdown();
+    }
+
+    private static void writePassiveArchive(Path modsDir, String projectId) throws Exception {
+        Files.createDirectories(modsDir);
+        try (ZipOutputStream zip = new ZipOutputStream(Files.newOutputStream(modsDir.resolve("host.jar")))) {
+            zip.putNextEntry(new ZipEntry("manifest.json"));
+            zip.write("""
+                    {"Group":"Example","Name":"Telemetry","Version":"1.0.0"}
+                    """.getBytes(StandardCharsets.UTF_8));
+            zip.closeEntry();
+            zip.putNextEntry(new ZipEntry("META-INF/beacon/projects/library.json"));
+            zip.write("""
+                    {
+                      "projectId":"%s",
+                      "displayName":"Passive Library",
+                      "projectVersion":"1.0.0",
+                      "ownerPluginIdentifiers":["Example:Library"],
+                      "telemetry":{"stats":{"supported":true,"allowedEvents":["heartbeat"]}}
+                    }
+                    """.formatted(projectId).getBytes(StandardCharsets.UTF_8));
+            zip.closeEntry();
+        }
     }
 
     private TelemetryRuntimeProviderHandle handle(String providerId,

@@ -33,9 +33,10 @@ public final class TelemetryConsentStateStore {
     }
 
     public boolean isReviewed(@Nonnull Path file, @Nonnull TelemetryProjectRegistration project) {
-        LinkedHashMap<String, ReviewedProjectDocument> reviewed = reviewedEntries(file);
+        StateReadResult state = readWithStatus(file);
+        LinkedHashMap<String, ReviewedProjectDocument> reviewed = reviewedEntries(state.document());
         ReviewedProjectDocument exact = reviewed.get(key(project));
-        return exact != null && addedSupportedCategories(file, project).isEmpty();
+        return exact != null && addedSupportedCategories(state, project).isEmpty();
     }
 
     /**
@@ -48,7 +49,12 @@ public final class TelemetryConsentStateStore {
     @Nonnull
     public List<String> addedSupportedCategories(@Nonnull Path file,
                                                   @Nonnull TelemetryProjectRegistration project) {
-        StateReadResult state = readWithStatus(file);
+        return addedSupportedCategories(readWithStatus(file), project);
+    }
+
+    @Nonnull
+    private List<String> addedSupportedCategories(@Nonnull StateReadResult state,
+                                                   @Nonnull TelemetryProjectRegistration project) {
         StateDocument document = state.document();
         ReviewedProjectDocument baseline = reviewedBaseline(document, project);
         List<String> current = TelemetryConsentCapabilities.supportedCategoryNames(project);
@@ -91,11 +97,13 @@ public final class TelemetryConsentStateStore {
     public List<TelemetryProjectRegistration> unreviewedProjects(
             @Nonnull Path file,
             @Nonnull List<TelemetryProjectRegistration> projects) {
-        Map<String, ReviewedProjectDocument> reviewed = reviewedEntries(read(file));
+        // Use one consent snapshot for the whole check, including capability comparisons.
+        StateReadResult state = readWithStatus(file);
+        Map<String, ReviewedProjectDocument> reviewed = reviewedEntries(state.document());
         ArrayList<TelemetryProjectRegistration> unreviewed = new ArrayList<>();
         for (TelemetryProjectRegistration project : projects) {
             ReviewedProjectDocument exact = reviewed.get(key(project));
-            if (exact == null || !addedSupportedCategories(file, project).isEmpty()) {
+            if (exact == null || !addedSupportedCategories(state, project).isEmpty()) {
                 unreviewed.add(project);
             }
         }
@@ -143,11 +151,6 @@ public final class TelemetryConsentStateStore {
             warn("Failed to save telemetry consent funnel state to " + file, ex);
             return false;
         }
-    }
-
-    @Nonnull
-    private LinkedHashMap<String, ReviewedProjectDocument> reviewedEntries(@Nonnull Path file) {
-        return reviewedEntries(read(file));
     }
 
     @Nonnull

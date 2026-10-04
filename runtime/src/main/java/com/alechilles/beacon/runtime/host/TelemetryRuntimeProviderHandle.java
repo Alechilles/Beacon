@@ -250,15 +250,14 @@ final class TelemetryRuntimeProviderHandle implements TelemetryRuntimeHostHandle
     void onPlayerReady(@Nonnull PlayerReadyEvent event) {
         if (ownsActiveCoordinator()) {
             commandRegistrar.onPlayerReady(event);
-            refreshDiscoveredProjects();
             consentCoordinator.onPlayerReady(event);
         }
     }
 
     void onBoot() {
-        if (ownsActiveCoordinator()) {
-            refreshDiscoveredProjects();
-        }
+        // Standby providers also need the completed startup snapshot for coordinator failover.
+        // Player-ready must not scan mod archives on the world thread.
+        refreshDiscoveredProjects();
     }
 
     private void refreshDiscoveredProjects() {
@@ -271,7 +270,7 @@ final class TelemetryRuntimeProviderHandle implements TelemetryRuntimeHostHandle
         } catch (RuntimeException ex) {
             if (logger != null) {
                 logger.at(java.util.logging.Level.WARNING).withCause(ex).log(
-                        "Telemetry skipped late passive-project discovery after player ready."
+                        "Telemetry skipped passive-project discovery at boot."
                 );
             }
         }
