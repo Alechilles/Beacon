@@ -1,5 +1,11 @@
 # Changelog
 
+## 2.0.4 - Update Checker Compatibility Hotfix - 2026-10-13
+
+- Added Beacon's CurseForge project ID to the standalone manifest so update checkers can identify its project without a manual mapping.
+- Keep the project ID configured during Gradle manifest generation.
+
+
 ## 2.0.3 - Player Ready Performance Hotfix - 2026-10-04
 
 - Removed mod archive discovery from player-ready handling to reduce join and world-transfer stalls. Discovery runs during startup, including for standby Beacon providers.

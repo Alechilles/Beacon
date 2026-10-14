@@ -44,6 +44,7 @@ hytaleTools {
     manifestServerVersion = '>=0.5.0 <0.8.0 || >=0.7.0-pre.4 <0.7.0'
     manifestGroup = 'Alechilles'
     modId = 'Beacon'
+    curseforgeId = '1520383'
     modDescription = 'Beacon — The developer platform behind ModStats.io.'
     modUrl = 'https://beacon.modstats.io'
     modCredits = 'Alec (Alechilles)||https://www.curseforge.com/members/alechilles/projects'
