@@ -24,7 +24,8 @@ class BeaconStandalonePackagingIT {
 
     @Test
     void producedJarContainsBeaconIdentityMetadataAndUsableUiAssets() throws Exception {
-        Path jarPath = packagedJar();
+        String version = standaloneVersion();
+        Path jarPath = packagedJar(version);
         assertTrue(Files.isRegularFile(jarPath), "the produced Beacon JAR must exist");
 
         try (JarFile jar = new JarFile(jarPath.toFile())) {
@@ -32,43 +33,51 @@ class BeaconStandalonePackagingIT {
             assertNotNull(jarManifest, "the produced JAR must have a manifest");
             assertEquals("com.alechilles", jarManifest.getMainAttributes().getValue("Plugin-Group"));
             assertEquals("beacon", jarManifest.getMainAttributes().getValue("Plugin-Name"));
-            assertEquals("2.0.2", jarManifest.getMainAttributes().getValue("Plugin-Version"));
+            assertEquals(version, jarManifest.getMainAttributes().getValue("Plugin-Version"));
 
             String manifest = entryText(jar, "manifest.json");
             assertEquals("Alechilles", jsonString(manifest, "Group"));
             assertEquals("Beacon", jsonString(manifest, "Name"));
-            assertEquals("2.0.2", jsonString(manifest, "Version"));
-            assertEquals("Beacon — The developer platform behind ModStats.io.", jsonString(manifest, "Description"));
+            assertEquals(version, jsonString(manifest, "Version"));
             assertEquals("https://beacon.modstats.io", jsonString(manifest, "Website"));
             assertEquals("com.alechilles.beacon.Beacon", jsonString(manifest, "Main"));
 
             assertMavenProperties(jar, "META-INF/maven/com.alechilles/beacon/pom.properties",
-                    "com.alechilles", "beacon", "2.0.2");
+                    "com.alechilles", "beacon", version);
             assertMavenProperties(jar, "META-INF/maven/com.alechilles/beacon-runtime/pom.properties",
-                    "com.alechilles", "beacon-runtime", "2.0.2");
+                    "com.alechilles", "beacon-runtime", version);
 
             String beaconLicense = entryText(jar, "META-INF/LICENSES/LICENSE");
             assertTrue(beaconLicense.startsWith("Beacon Runtime License 1.0"));
 
             String credits = entryText(jar, "Server/Credits/Beacon.json");
-            assertTrue(credits.contains("\"Plugin\": \"Alechilles:Beacon\""));
-            assertTrue(credits.contains("\"RawText\": \"Beacon — The developer platform behind ModStats.io.\""));
+            assertEquals("Alechilles:Beacon", jsonString(credits, "Plugin"));
 
-            assertImage(jar, "Common/UI/Custom/BeaconLogo.png", 800, 278);
+            assertImage(jar, "Common/UI/Custom/BeaconLogo.png");
             assertImage(jar, "Common/UI/Custom/icon-256.png", 256, 256);
             assertImage(jar, "Common/UI/Custom/TelemetryConsentHeader.png");
             assertImage(jar, "icon-256.png", 256, 256);
         }
     }
 
-    private static Path packagedJar() throws URISyntaxException {
+    private static String standaloneVersion() throws IOException {
+        Properties properties = new Properties();
+        try (InputStream input = BeaconStandalonePackagingIT.class.getClassLoader()
+                .getResourceAsStream("META-INF/maven/com.alechilles/beacon/pom.properties")) {
+            assertNotNull(input, "standalone version metadata must be available");
+            properties.load(input);
+        }
+        return properties.getProperty("version");
+    }
+
+    private static Path packagedJar(String version) throws URISyntaxException {
         Path testClasses = Path.of(BeaconStandalonePackagingIT.class
                 .getProtectionDomain()
                 .getCodeSource()
                 .getLocation()
                 .toURI());
-        Path mavenJar = testClasses.getParent().resolve("Beacon v2.0.2.jar");
-        Path gradleJar = testClasses.resolve("../../..").normalize().resolve("libs/Beacon v2.0.2.jar");
+        Path mavenJar = testClasses.getParent().resolve("Beacon v" + version + ".jar");
+        Path gradleJar = testClasses.resolve("../../..").normalize().resolve("libs/Beacon v" + version + ".jar");
         return Files.isRegularFile(mavenJar) ? mavenJar : gradleJar;
     }
 

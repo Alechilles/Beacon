@@ -81,6 +81,7 @@ tasks.named('assemble') {
 }
 
 tasks.withType(Test).configureEach {
+    dependsOn(tasks.named('shadowJar'))
     useJUnitPlatform()
     workingDir projectDir
     systemProperty 'java.util.logging.manager', 'com.hypixel.hytale.logger.backend.HytaleLogManager'
