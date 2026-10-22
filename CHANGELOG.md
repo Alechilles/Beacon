@@ -1,5 +1,9 @@
 # Changelog
 
+## 2.0.5 - Upload Error Hotfix - 2026-10-22
+
+- Uploads that hit a JVM error, such as running out of memory or native threads, now count as a failed upload. The report stays queued and is retried later instead of crashing the upload thread and creating a flood of new crash reports.
+
 ## 2.0.4 - Update Checker Compatibility Hotfix - 2026-10-13
 
 - Added Beacon's CurseForge project ID to the standalone manifest so update checkers can identify its project without a manual mapping.
