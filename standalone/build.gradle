@@ -58,7 +58,7 @@ tasks.named('jar') {
 }
 
 tasks.named('shadowJar', ShadowJar) {
-    archiveFileName = "Beacon v${project.version}.jar"
+    archiveFileName = "Beacon-v${project.version}.jar"
     archiveClassifier = ''
     exclude 'META-INF/MANIFEST.MF', 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
     manifest {

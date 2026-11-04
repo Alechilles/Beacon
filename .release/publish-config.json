@@ -2,7 +2,7 @@
   "modName": "Beacon",
   "repository": "Alechilles/Beacon",
   "packaging": "jar",
-  "artifactNameTemplate": "Beacon v{version}.jar",
+  "artifactNameTemplate": "Beacon-v{version}.jar",
   "versionSource": "pom",
   "versionFile": "pom.xml",
   "modifold": {

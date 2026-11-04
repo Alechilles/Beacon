@@ -61,7 +61,7 @@
     </dependencies>
 
     <build>
-        <finalName>Beacon v${project.version}</finalName>
+        <finalName>Beacon-v${project.version}</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
