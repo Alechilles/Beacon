@@ -35,7 +35,7 @@ This is the default operating contract for human and AI contributors working in 
   and Maven metadata to the production downloads repository.
 - The verified production root is
   `/srv/apps/alecs-telemetry-downloads/maven/releases` on the current Telemetry
-  VPS. Use the `alecs-telemetry-vps` skill before you change this path.
+  VPS. Use the `alec-vps-ops` skill before you change this path.
 - Do not mark a release as published until all these checks pass:
   - `/api/v1/downloads` lists the new version as `latestRuntime`.
   - `/downloads/runtime/latest` redirects to the new runtime JAR.
